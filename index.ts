@@ -1,13 +1,12 @@
 
 import { events } from "bdsx/event";
 
-console.log('[plugin:Chestui] allocated');
+console.log('[HSChest] allocated');
 
 events.serverOpen.on(()=>{
-    console.log('[plugin:Chestui] launching');
+    console.log('[HSChest] launching');
 });
 
 events.serverClose.on(()=>{
-    console.log('[plugin:Chestui] closed');
+    console.log('[HSChest] closed');
 });
-

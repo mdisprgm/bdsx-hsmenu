@@ -15,6 +15,6 @@
   },
   "devDependencies": {
     "@types/node": "^12.20.36",
-    "bdsx": "../bdsx"
+    "bdsx": "file:../bdsx"
   }
 }

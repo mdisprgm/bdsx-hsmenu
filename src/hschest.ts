@@ -15,6 +15,9 @@ import {
 import { ServerPlayer } from "bdsx/bds/player";
 import { CANCEL } from "bdsx/common";
 import { events } from "bdsx/event";
+import { PlayerLeftEvent } from "bdsx/event_impl/entityevent";
+import { bedrockServer } from "bdsx/launcher";
+import { InventorySlotPacket$InventorySlotPacket } from "./hacker";
 
 export class HSChest {
     static delay = 0;
@@ -27,7 +30,7 @@ export class HSChest {
 
     protected itemStackRequestCb: (pk: ItemStackRequestPacket, ni: NetworkIdentifier) => CANCEL | void;
     protected containerCloseCb: (pk: ContainerClosePacket, ni: NetworkIdentifier) => CANCEL | void;
-    protected disonnectCb: (ni: NetworkIdentifier) => void;
+    protected disonnectCb: (event: PlayerLeftEvent) => void;
 
     protected constructor(private entity: ServerPlayer, public slots: Record<number, ItemStack>, callback: (this: HSChest, slot: number, item: ItemStack) => void) {
         this.ni = entity.getNetworkIdentifier();
@@ -39,12 +42,13 @@ export class HSChest {
         this.id = entity.nextContainerCounter();
         this.placeChest();
 
-        setTimeout(() => {
+        bedrockServer.serverInstance.nextTick().then(async () => {
+            await new Promise((resolve) => setTimeout(resolve, HSChest.delay));
             this.openChest();
-            for (let [slot, item] of Object.entries(slots)) {
+            for (const [slot, item] of Object.entries(slots)) {
                 this.setItem(+slot, item);
             }
-        }, HSChest.delay);
+        });
 
         events.packetBefore(MinecraftPacketIds.ItemStackRequest).on(
             (this.itemStackRequestCb = (pk, ni) => {
@@ -64,24 +68,24 @@ export class HSChest {
                 if (ni.equals(this.ni)) this.destruct();
             }),
         );
-        events.networkDisconnected.on(
-            (this.disonnectCb = (pk) => {
-                if (pk.equals(this.ni)) this.destruct();
-            }),
-        );
+        events.playerLeft.on((event) => {
+            this.disonnectCb = (ev) => {
+                if (event.player.getNetworkIdentifier().equals(this.ni)) this.destruct();
+            };
+        });
     }
 
-    private destruct() {
+    private destruct(): void {
         for (let [slot, item] of Object.entries(this.slots)) {
             item.destruct();
         }
         this.destroyChest();
         events.packetBefore(MinecraftPacketIds.ItemStackRequest).remove(this.itemStackRequestCb);
         events.packetBefore(MinecraftPacketIds.ContainerClose).remove(this.containerCloseCb);
-        events.networkDisconnected.remove(this.disonnectCb);
+        events.playerLeft.remove(this.disonnectCb);
     }
 
-    private placeChest() {
+    private placeChest(): void {
         const region = this.entity.getRegion();
         this.blockId = region.getBlock(this.blockPos).getRuntimeId()!;
 
@@ -94,7 +98,7 @@ export class HSChest {
         pk.dispose();
     }
 
-    private destroyChest() {
+    private destroyChest(): void {
         const pk = UpdateBlockPacket.allocate();
         pk.blockPos.set(this.blockPos);
         pk.dataLayerId = 0;
@@ -111,7 +115,7 @@ export class HSChest {
         }
     }
 
-    private openChest() {
+    private openChest(): void {
         const pk = ContainerOpenPacket.allocate();
         pk.containerId = this.id;
         pk.type = ContainerType.Container;
@@ -126,12 +130,12 @@ export class HSChest {
         if (!this.slots[slot]?.sameItem(item)) this.slots[slot].destruct();
         this.slots[slot] = item;
         const pk = new InventorySlotPacket(true);
-        pk.constructWith(this.id, slot, item);
+        InventorySlotPacket$InventorySlotPacket(pk, this.id, slot, item);
         pk.sendTo(this.ni);
         pk.destruct();
     }
 
-    static sendToPlayer(pl: ServerPlayer, slots: Record<number, ItemStack>, callback: (this: HSChest, slot: number, item: ItemStack) => void) {
-        new HSChest(pl, slots, callback);
+    static openTo(player: ServerPlayer, slots: Record<number, ItemStack>, callback: (this: HSChest, slot: number, item: ItemStack) => void) {
+        new HSChest(player, slots, callback);
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@bdsx/hschest",
-  "private":true,
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,12 +9,12 @@
   "license": "ISC",
   "bdsxPlugin": true,
   "scripts": {
-    "build": "tsc --removeComments",
-    "watch": "tsc -w --removeComments",
+    "build": "tsc -d --removeComments",
+    "watch": "tsc -w -d --removeComments",
     "prepare": "tsc || exit 0"
   },
   "devDependencies": {
     "@types/node": "^12.20.36",
-    "bdsx":"../bdsx"
+    "bdsx": "../bdsx"
   }
 }

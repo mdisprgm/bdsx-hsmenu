@@ -8,13 +8,7 @@ const hacker = new ProcHacker({
     ...pdb.getList("hacker.ini", {}, ["??0InventorySlotPacket@@QEAA@W4ContainerID@@IAEBVItemStack@@@Z"]),
 });
 
-declare module "bdsx/bds/packets" {
-    interface InventorySlotPacket {
-        constructWith(containerId: number, slot: number, item: ItemStack): void;
-    }
-}
-
-const InventorySlotPacket$InventorySlotPacket = hacker.js(
+export const InventorySlotPacket$InventorySlotPacket = hacker.js(
     "??0InventorySlotPacket@@QEAA@W4ContainerID@@IAEBVItemStack@@@Z",
     InventorySlotPacket,
     null,
@@ -23,7 +17,3 @@ const InventorySlotPacket$InventorySlotPacket = hacker.js(
     uint32_t,
     ItemStack,
 );
-InventorySlotPacket.prototype.constructWith = function (containerId: number, slot: number, item: ItemStack): void {
-    InventorySlotPacket$InventorySlotPacket(this, containerId, slot, item);
-    return;
-};

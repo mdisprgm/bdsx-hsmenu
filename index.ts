@@ -10,7 +10,7 @@ Credit: @Rjlintkh (https://discord.com/channels/646456965983240212/8147686667419
 */
 
 import { events } from "bdsx/event";
-import { HSChest } from "./src/hschest";
+import { HSBlock, HSChest, HSDoubleChest, HSMenu } from "./src";
 
 console.log("[HSChest] allocated");
 
@@ -22,4 +22,4 @@ events.serverClose.on(() => {
     console.log("[HSChest] closed");
 });
 
-export { HSChest };
+export { HSBlock, HSChest, HSDoubleChest, HSMenu };

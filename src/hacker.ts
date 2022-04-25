@@ -1,15 +1,10 @@
 import { BlockPos } from "bdsx/bds/blockpos";
 import { ItemStack } from "bdsx/bds/inventory";
 import { InventorySlotPacket, UpdateBlockPacket } from "bdsx/bds/packets";
-import { pdb } from "bdsx/core";
 import { uint32_t, uint8_t } from "bdsx/nativetype";
-import { ProcHacker } from "bdsx/prochacker";
+import { procHacker } from "bdsx/prochacker";
 
-const hacker = new ProcHacker({
-    ...pdb.getList("hacker.ini", {}, ["??0InventorySlotPacket@@QEAA@W4ContainerID@@IAEBVItemStack@@@Z", "??0UpdateBlockPacket@@QEAA@AEBVBlockPos@@IIE@Z"]),
-});
-
-export const InventorySlotPacket$InventorySlotPacket = hacker.js(
+export const InventorySlotPacket$InventorySlotPacket = procHacker.js(
     "??0InventorySlotPacket@@QEAA@W4ContainerID@@IAEBVItemStack@@@Z",
     InventorySlotPacket,
     null,
@@ -19,7 +14,7 @@ export const InventorySlotPacket$InventorySlotPacket = hacker.js(
     ItemStack,
 );
 
-export const UpdateBlockPacket$UpdateBlockPacket = hacker.js(
+export const UpdateBlockPacket$UpdateBlockPacket = procHacker.js(
     "??0UpdateBlockPacket@@QEAA@AEBVBlockPos@@IIE@Z",
     UpdateBlockPacket,
     null,

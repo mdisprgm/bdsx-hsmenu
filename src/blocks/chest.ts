@@ -15,7 +15,7 @@ export class HSChest implements HSBlock {
     private originalBlockId = new Map<Player, number>();
 
     static new(): HSChest {
-        return new HSChest();
+        return new this();
     }
 
     protected constructor() {

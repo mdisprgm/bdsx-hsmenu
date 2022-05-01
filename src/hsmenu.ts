@@ -15,7 +15,6 @@ import { ServerPlayer } from "bdsx/bds/player";
 import { CANCEL } from "bdsx/common";
 import { events } from "bdsx/event";
 import { PlayerLeftEvent } from "bdsx/event_impl/entityevent";
-import { bedrockServer } from "bdsx/launcher";
 import { InventorySlotPacket$InventorySlotPacket } from "./hacker";
 import { HSBlock } from "./hsblock";
 
@@ -58,7 +57,12 @@ export class HSMenu {
         this.sendItem(slot, item);
         this.sendInventory();
     }
-    constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (this: HSMenu, slotInfo: ItemStackRequestSlotInfo, itemStack: ItemStack) => void) {
+    constructor(
+        player: ServerPlayer,
+        block: HSBlock,
+        slots: ContainerItems = {},
+        callback?: (this: HSMenu, slotInfo: ItemStackRequestSlotInfo, itemStack: ItemStack) => void,
+    ) {
         this.entity = player;
         this.netId = player.getNetworkIdentifier();
         this.block = block;
@@ -73,15 +77,9 @@ export class HSMenu {
 
         this.containerId = this.entity.nextContainerCounter();
 
-        // openChest
-        bedrockServer.serverInstance.nextTick().then(async () => {
-            // Sleep
-            this.open();
-            for (const [slot, item] of Object.entries(slots)) {
-                this.setItem(+slot, item);
-            }
-            this.sendInventory();
-        });
+        for (const [slot, item] of Object.entries(this.slots)) {
+            this.setItem(+slot, item);
+        }
 
         events.packetBefore(MinecraftPacketIds.ItemStackRequest).on(
             (this.onItemStackRequest = (pk, ni) => {
@@ -108,6 +106,8 @@ export class HSMenu {
     }
 
     private openChest(): void {
+        this.hasOpen = true;
+
         const pk = ContainerOpenPacket.allocate();
         pk.containerId = this.containerId;
         pk.type = HSBlock.TypeToContainerType[this.block.type] ?? ContainerType.Container;
@@ -132,10 +132,12 @@ export class HSMenu {
         events.packetBefore(MinecraftPacketIds.ContainerClose).remove(this.onContainerClose);
         events.playerLeft.remove(this.onDisconnect);
     }
-    private open(): void {
-        this.hasOpen = true;
+    open(delay = 50): void {
         this.placeChest();
-        this.openChest();
+        setTimeout(() => {
+            this.openChest();
+            this.sendInventory();
+        }, delay);
     }
     close(): void {
         this.assertDefault();

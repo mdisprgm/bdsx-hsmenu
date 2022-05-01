@@ -1,5 +1,6 @@
 import { BlockPos } from "bdsx/bds/blockpos";
-import { UpdateBlockPacket } from "bdsx/bds/packets";
+import { ByteTag, IntTag } from "bdsx/bds/nbt";
+import { BlockActorDataPacket, UpdateBlockPacket } from "bdsx/bds/packets";
 import { ServerPlayer } from "bdsx/bds/player";
 import { HSBlock } from "../hsblock";
 import { HSChest } from "./chest";
@@ -16,6 +17,7 @@ export class HSDoubleChest extends HSChest {
         super.place(target);
 
         const region = target.getRegion();
+        const firstBlockPos = this.blockPos.get(target)!;
         const secondBlockPos = this.initSecondPosition(target)!;
         const secondBlockId = region.getBlock(secondBlockPos).getRuntimeId()!;
         this.setSecondBlockId(target, secondBlockId);
@@ -24,6 +26,19 @@ export class HSDoubleChest extends HSChest {
         HSBlock.initUpdateBlockPacket(pk, secondBlockPos, 0, this.block.getRuntimeId(), UpdateBlockPacket.Flags.NoGraphic);
         target.sendPacket(pk);
         pk.dispose();
+
+        const blkDataPkt = BlockActorDataPacket.allocate();
+        blkDataPkt.pos.set(secondBlockPos);
+        {
+            const pairlead = ByteTag.allocateWith(1);
+            const pairx = IntTag.allocateWith(firstBlockPos.x);
+            const pairz = IntTag.allocateWith(firstBlockPos.z);
+            blkDataPkt.data.setAllocated("pairlead", pairlead);
+            blkDataPkt.data.setAllocated("pairx", pairx);
+            blkDataPkt.data.setAllocated("pairz", pairz);
+        }
+        target.sendPacket(blkDataPkt);
+        blkDataPkt.dispose();
     }
 
     destroy(target: ServerPlayer) {

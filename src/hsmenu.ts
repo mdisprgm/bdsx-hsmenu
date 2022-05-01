@@ -42,7 +42,7 @@ export class HSMenu {
      * @param slot slot n umber
      */
     setItem(slot: number, item: ItemStack): void {
-        this.slots[slot] = item;
+        this.slots[slot] = item.clone();
     }
     /**
      *

@@ -8,7 +8,7 @@ import {
     InventorySlotPacket,
     ItemStackRequestActionTransferBase,
     ItemStackRequestActionType,
-    ItemStackRequestPacket
+    ItemStackRequestPacket,
 } from "bdsx/bds/packets";
 import { ServerPlayer } from "bdsx/bds/player";
 import { CANCEL } from "bdsx/common";
@@ -75,7 +75,7 @@ export class HSMenu {
         // openChest
         bedrockServer.serverInstance.nextTick().then(async () => {
             // Sleep
-            this.openChest();
+            this.open();
             for (const [slot, item] of Object.entries(slots)) {
                 this.setItem(+slot, item);
             }

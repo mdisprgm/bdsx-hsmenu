@@ -97,7 +97,7 @@ export class HSMenu {
         );
         events.packetBefore(MinecraftPacketIds.ContainerClose).on(
             (this.onContainerClose = (pk, ni) => {
-                if (ni.equals(this.netId)) this.destruct();
+                if (ni.equals(this.netId)) this.close();
             }),
         );
         events.playerLeft.on((event) => {
@@ -132,7 +132,7 @@ export class HSMenu {
         events.packetBefore(MinecraftPacketIds.ContainerClose).remove(this.onContainerClose);
         events.playerLeft.remove(this.onDisconnect);
     }
-    open(): void {
+    private open(): void {
         this.hasOpen = true;
         this.placeChest();
         this.openChest();

@@ -1,6 +1,6 @@
 import { Block } from "bdsx/bds/block";
 import { BlockPos } from "bdsx/bds/blockpos";
-import { UpdateBlockPacket } from "bdsx/bds/packets";
+import { ContainerClosePacket, UpdateBlockPacket } from "bdsx/bds/packets";
 import { Player, ServerPlayer } from "bdsx/bds/player";
 import { HSBlock } from "../hsblock";
 export class HSChest implements HSBlock {
@@ -24,7 +24,8 @@ export class HSChest implements HSBlock {
     place(target: ServerPlayer): void {
         const blockPos = this.initPosition(target);
         const blockId = this.block.getRuntimeId();
-        this.setBlockId(target, blockId);
+        const orgBlkId = target.getRegion().getBlock(blockPos).getRuntimeId();
+        this.setBlockId(target, orgBlkId);
 
         const pk = UpdateBlockPacket.allocate();
         pk.destruct();
@@ -36,11 +37,11 @@ export class HSChest implements HSBlock {
     destroy(target: ServerPlayer) {
         const blockPos = this.getPosition(target)!;
 
-        const pk = UpdateBlockPacket.allocate();
-        pk.destruct();
-        HSBlock.initUpdateBlockPacket(pk, blockPos, 0, this.getBlockId(target), UpdateBlockPacket.Flags.NoGraphic);
-        target.sendPacket(pk);
-        pk.dispose();
+        const blockPkt = UpdateBlockPacket.allocate();
+        blockPkt.destruct();
+        HSBlock.initUpdateBlockPacket(blockPkt, blockPos, 0, this.getBlockId(target), UpdateBlockPacket.Flags.NoGraphic);
+        target.sendPacket(blockPkt);
+        blockPkt.dispose();
 
         const region = target.getRegion();
         const blockEntity = region.getBlockEntity(blockPos);

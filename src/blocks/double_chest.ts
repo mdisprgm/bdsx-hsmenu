@@ -57,7 +57,7 @@ export class HSDoubleChest extends HSChest {
         const blockPos = BlockPos.create(0, 0, 0);
 
         blockPos.set(player.getFeetPos());
-        blockPos.y += 4;
+        blockPos.y += this.blockYOffset;
         blockPos.x += 1;
         if (blockPos.x < 0) blockPos.x--;
         if (blockPos.z < 0) blockPos.z--;

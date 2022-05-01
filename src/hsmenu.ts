@@ -11,7 +11,7 @@ import {
     ItemStackRequestActionTransferBase,
     ItemStackRequestActionType,
     ItemStackRequestPacket,
-    ItemStackRequestSlotInfo,
+    ItemStackRequestSlotInfo
 } from "bdsx/bds/packets";
 import { ServerPlayer } from "bdsx/bds/player";
 import { CANCEL } from "bdsx/common";
@@ -77,7 +77,7 @@ export class HSMenu {
 
         this.slots = slots;
 
-        this.containerId = this.entity.nextContainerCounter();
+        this.mContainerId = this.entity.nextContainerCounter();
 
         for (const [slot, item] of Object.entries(this.slots)) {
             this.setItem(+slot, item);
@@ -111,7 +111,7 @@ export class HSMenu {
         this.hasOpen = true;
 
         const pk = ContainerOpenPacket.allocate();
-        pk.containerId = this.containerId;
+        pk.containerId = this.mContainerId;
         pk.type = HSBlock.TypeToContainerType[this.block.type] ?? ContainerType.Container;
         pk.pos.set(this.blockPos);
         this.entity.sendPacket(pk);
@@ -152,7 +152,7 @@ export class HSMenu {
             const slot = +slot_;
             if (!this.slots[slot]?.sameItem(item)) this.slots[slot].destruct();
             const pk = new InventorySlotPacket(true);
-            HSMenu.initInventorySlotPacket(pk, this.containerId, slot, item);
+            HSMenu.initInventorySlotPacket(pk, this.mContainerId, slot, item);
             this.entity.sendPacket(pk);
             pk.destruct();
         }
@@ -167,8 +167,11 @@ export class HSMenu {
 
     private block: HSBlock;
     private blockPos: BlockPos = BlockPos.create(0, 0, 0);
-    private containerId: number;
-    private entity: ServerPlayer;
+    private mContainerId: number;
+    get containerId(): number {
+        return this.mContainerId;
+    }
+    entity: ServerPlayer;
     private slots: Record<number, ItemStack>;
     private netId: NetworkIdentifier;
     private size: HSBlock.size;

@@ -8,6 +8,7 @@ import { UpdateBlockPacket$UpdateBlockPacket } from "./hacker";
 export interface HSBlock {
     place(target: ServerPlayer): void;
     destroy(target: ServerPlayer): void;
+    get blockYOffset(): number;
 
     block: Block;
     size: HSBlock.size;

@@ -1,12 +1,15 @@
 import { Block } from "bdsx/bds/block";
 import { BlockPos } from "bdsx/bds/blockpos";
-import { ContainerClosePacket, UpdateBlockPacket } from "bdsx/bds/packets";
+import { UpdateBlockPacket } from "bdsx/bds/packets";
 import { Player, ServerPlayer } from "bdsx/bds/player";
 import { HSBlock } from "../hsblock";
 export class HSChest implements HSBlock {
     block: Block;
     type: HSBlock.Type = HSBlock.Type.Chest;
     size: HSBlock.size = HSBlock.TypeToSize[this.type];
+    get blockYOffset() {
+        return 3;
+    }
 
     private blockPos = new Map<Player, BlockPos>();
     private originalBlockId = new Map<Player, number>();
@@ -57,7 +60,7 @@ export class HSChest implements HSBlock {
         const blockPos = BlockPos.create(0, 0, 0);
 
         blockPos.set(player.getFeetPos());
-        blockPos.y += 4;
+        blockPos.y += this.blockYOffset;
         if (blockPos.x < 0) blockPos.x--;
         if (blockPos.z < 0) blockPos.z--;
 

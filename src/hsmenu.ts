@@ -64,7 +64,7 @@ export class HSMenu {
         this.size = this.block.size;
 
         this.blockPos.set(player.getFeetPos());
-        this.blockPos.y += 4;
+        this.blockPos.y += this.block.blockYOffset;
         if (this.blockPos.x < 0) this.blockPos.x--;
         if (this.blockPos.z < 0) this.blockPos.z--;
 

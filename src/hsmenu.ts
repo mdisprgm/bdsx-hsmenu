@@ -58,7 +58,7 @@ export class HSMenu {
         this.sendItem(slot, item);
         this.sendInventory();
     }
-    constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (this: HSMenu, slot: ItemStackRequestSlotInfo, item: ItemStack) => void) {
+    constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (this: HSMenu, slotInfo: ItemStackRequestSlotInfo, item: ItemStack) => void) {
         this.entity = player;
         this.netId = player.getNetworkIdentifier();
         this.block = block;

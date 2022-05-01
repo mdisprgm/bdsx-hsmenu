@@ -9,6 +9,7 @@ import {
     ItemStackRequestActionTransferBase,
     ItemStackRequestActionType,
     ItemStackRequestPacket,
+    ItemStackRequestSlotInfo,
 } from "bdsx/bds/packets";
 import { ServerPlayer } from "bdsx/bds/player";
 import { CANCEL } from "bdsx/common";
@@ -57,7 +58,7 @@ export class HSMenu {
         this.sendItem(slot, item);
         this.sendInventory();
     }
-    constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (this: HSMenu, slot: number, item: ItemStack) => void) {
+    constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (this: HSMenu, slot: ItemStackRequestSlotInfo, item: ItemStack) => void) {
         this.entity = player;
         this.netId = player.getNetworkIdentifier();
         this.block = block;
@@ -89,8 +90,7 @@ export class HSMenu {
                     const action = data?.actions.get(0);
                     if (action?.type === ItemStackRequestActionType.Take && action instanceof ItemStackRequestActionTransferBase) {
                         const slotInfo = action.getSrc();
-                        const slot = slotInfo.slot;
-                        if (callback) callback.call(this, slot, this.slots[slot]);
+                        if (callback) callback.call(this, slotInfo, this.slots[slotInfo.slot]);
                     }
                 }
             }),

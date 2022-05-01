@@ -1,8 +1,10 @@
 import { BlockPos } from "bdsx/bds/blockpos";
 import { ContainerType, ItemStack } from "bdsx/bds/inventory";
+import { StringTag } from "bdsx/bds/nbt";
 import { NetworkIdentifier } from "bdsx/bds/networkidentifier";
 import { MinecraftPacketIds } from "bdsx/bds/packetids";
 import {
+    BlockActorDataPacket,
     ContainerClosePacket,
     ContainerOpenPacket,
     InventorySlotPacket,
@@ -154,6 +156,13 @@ export class HSMenu {
             this.entity.sendPacket(pk);
             pk.destruct();
         }
+    }
+    setTitle(title: string): void {
+        const pkt = BlockActorDataPacket.allocate();
+        pkt.pos.set(this.blockPos);
+        pkt.data.setAllocated("CustomName", StringTag.allocateWith(title));
+        this.entity.sendPacket(pkt);
+        pkt.dispose();
     }
 
     private block: HSBlock;

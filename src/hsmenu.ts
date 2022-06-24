@@ -11,7 +11,7 @@ import {
     ItemStackRequestActionTransferBase,
     ItemStackRequestActionType,
     ItemStackRequestPacket,
-    ItemStackRequestSlotInfo
+    ItemStackRequestSlotInfo,
 } from "bdsx/bds/packets";
 import { ServerPlayer } from "bdsx/bds/player";
 import { CANCEL } from "bdsx/common";
@@ -56,7 +56,7 @@ export class HSMenu {
     }
     sendItem(slot: number, item: ItemStack): void {
         this.assertDefault();
-        this.sendItem(slot, item);
+        this.setItem(slot, item);
         this.sendInventory();
     }
     constructor(
@@ -100,11 +100,11 @@ export class HSMenu {
                 if (ni.equals(this.netId)) this.close();
             }),
         );
-        events.playerLeft.on((event) => {
-            this.onDisconnect = (ev) => {
+        events.playerLeft.on(
+            (this.onDisconnect = (event) => {
                 if (event.player.getNetworkIdentifier().equals(this.netId)) this.destruct();
-            };
-        });
+            }),
+        );
     }
 
     private openChest(): void {

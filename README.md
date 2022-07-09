@@ -22,8 +22,8 @@ events.playerJump.on((ev) => {
         {
             31: diamond,
         },
-        function (this, slot, item) {
-            if (slot.openContainerNetId !== 7) return;
+        function (this, data) {
+            if (data.slotInfo.openContainerNetId !== 7) return;
             this.entity.sendMessage("You can't take my precious!");
             this.close();
         },

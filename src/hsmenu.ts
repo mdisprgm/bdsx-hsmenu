@@ -99,7 +99,7 @@ export class HSMenu {
         );
         events.packetBefore(MinecraftPacketIds.ContainerClose).on(
             (this.onContainerClose = (pk, ni) => {
-                if (ni.equals(this.netId)) this.close();
+                if (ni.equals(this.netId) && !this.isDisabled()) this.close();
             }),
         );
         events.playerLeft.on(

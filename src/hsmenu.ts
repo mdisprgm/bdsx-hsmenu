@@ -145,6 +145,7 @@ export class HSMenu {
         this.assertDefault();
 
         this.destruct();
+        this.disable();
     }
     sendInventory(): void {
         this.assertDefault();
@@ -179,4 +180,15 @@ export class HSMenu {
     protected onItemStackRequest: (pk: ItemStackRequestPacket, ni: NetworkIdentifier) => CANCEL | void;
     protected onContainerClose: (pk: ContainerClosePacket, ni: NetworkIdentifier) => CANCEL | void;
     protected onDisconnect: (event: PlayerLeftEvent) => void;
+
+    private static Closed() {
+        throw new Error("the menu is closed already");
+    }
+    private disable() {
+        const properties: PropertyDescriptorMap = {};
+        for (const key of Object.getOwnPropertyNames(this)) {
+            properties[key] = { get: HSMenu.Closed };
+        }
+        Object.defineProperties(this, properties);
+    }
 }

@@ -9,10 +9,6 @@ export class HSDoubleChest extends HSChest {
     readonly size = HSBlock.Size.DoubleChest;
     readonly type = HSBlock.Type.DoubleChest;
 
-    static new(): HSDoubleChest {
-        return new HSDoubleChest();
-    }
-
     place(target: ServerPlayer): void {
         super.place(target);
 

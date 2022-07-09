@@ -14,11 +14,7 @@ export class HSChest implements HSBlock {
     protected blockPos = new Map<Player, BlockPos>();
     protected originalBlockId = new Map<Player, number>();
 
-    static new(): HSChest {
-        return new this();
-    }
-
-    protected constructor() {
+    constructor() {
         const block = Block.create("minecraft:chest");
         if (block == null) throw new Error("Block is invalid.");
         this.block = block;

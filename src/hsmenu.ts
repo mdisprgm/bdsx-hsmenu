@@ -22,6 +22,11 @@ import { HSBlock } from "./hsblock";
 
 type ContainerItems = Record<number, ItemStack>;
 
+class ResponseData {
+    slotInfo: ItemStackRequestSlotInfo;
+    itemStack: ItemStack;
+}
+
 export class HSMenu {
     private static initInventorySlotPacket(packet: InventorySlotPacket, containerId: number, slot: number, ItemStack: ItemStack): void {
         InventorySlotPacket$InventorySlotPacket(packet, containerId, slot, ItemStack);
@@ -61,12 +66,7 @@ export class HSMenu {
     }
 
     private TriggerActionType = new Set<ItemStackRequestActionType>([ItemStackRequestActionType.Take, ItemStackRequestActionType.Place]);
-    constructor(
-        player: ServerPlayer,
-        block: HSBlock,
-        slots: ContainerItems = {},
-        callback?: (this: HSMenu, slotInfo: ItemStackRequestSlotInfo, itemStack: ItemStack) => void,
-    ) {
+    constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (this: HSMenu, response: ResponseData) => void) {
         this.entity = player;
         this.netId = player.getNetworkIdentifier();
         this.block = block;
@@ -92,7 +92,11 @@ export class HSMenu {
                     const action = data?.actions.get(0);
                     if (this.TriggerActionType.has(action?.type) && action instanceof ItemStackRequestActionTransferBase) {
                         const slotInfo = action.getSrc();
-                        if (callback) callback.call(this, slotInfo, this.slots[slotInfo.slot]);
+
+                        const response = new ResponseData();
+                        response.slotInfo = slotInfo;
+                        response.itemStack = this.slots[slotInfo.slot];
+                        if (callback) callback.call(this, response);
                     }
                 }
             }),

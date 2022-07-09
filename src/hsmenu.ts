@@ -184,11 +184,21 @@ export class HSMenu {
     private static Closed() {
         throw new Error("the menu is closed already");
     }
-    private disable() {
+    private disabled = false;
+    /**
+     *
+     * @returns returns false if the instance is disabled already
+     */
+    private disable(): boolean {
+        if (!this.disabled) return false;
         const properties: PropertyDescriptorMap = {};
         for (const key of Object.getOwnPropertyNames(this)) {
             properties[key] = { get: HSMenu.Closed };
         }
         Object.defineProperties(this, properties);
+        return (this.disabled = true);
+    }
+    isDisabled(): boolean {
+        return this.disabled;
     }
 }

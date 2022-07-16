@@ -36,11 +36,11 @@ export class HSMenu {
         if (slot !== (slot | 0)) throw new Error("slot number must be an integer.");
         if (slot > this.size) throw new Error("slot number must be less than or equal to the size of the menu.");
     }
-    private asserMenuNotOpen(): void {
+    private assertMenuNotOpen(): void {
         if (!this.hasOpen) throw new Error("Menu is not open for the player.");
     }
     private assertDefault(): void {
-        this.asserMenuNotOpen();
+        this.assertMenuNotOpen();
     }
     /**
      *
@@ -52,7 +52,7 @@ export class HSMenu {
     /**
      *
      * @param slot slot n umber
-     * @returns DO NOT DESTRUCT. THEY MUST BE DESTRUTCTED BY LIBRARY.
+     * @returns DO NOT DESTRUCT. THEY MUST BE DESTRUCTED BY LIBRARY.
      */
     getItem(slot: number): ItemStack {
         this.assertValidSize(slot);

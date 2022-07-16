@@ -31,3 +31,6 @@ events.playerJump.on((ev) => {
     menu.open();
 });
 ```
+
+# License
+BSD

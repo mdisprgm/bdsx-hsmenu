@@ -33,4 +33,4 @@ events.playerJump.on((ev) => {
 ```
 
 # License
-BSD
+MIT

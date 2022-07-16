@@ -1,11 +1,11 @@
 {
   "name": "@bdsx/hsmenu",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "keywords": [],
   "author": "",
-  "license": "BSD",
+  "license": "MIT",
   "bdsxPlugin": true,
   "scripts": {
     "build": "tsc -d --removeComments",

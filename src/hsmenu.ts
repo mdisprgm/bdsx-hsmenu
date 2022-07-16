@@ -26,6 +26,9 @@ class ResponseData {
     slotInfo: ItemStackRequestSlotInfo;
     itemStack: ItemStack;
 }
+function createResponseData(slotInfo: ItemStackRequestSlotInfo, itemStack: ItemStack): ResponseData {
+    return { slotInfo, itemStack };
+}
 
 export class HSMenu {
     private static initInventorySlotPacket(packet: InventorySlotPacket, containerId: number, slot: number, ItemStack: ItemStack): void {
@@ -92,10 +95,7 @@ export class HSMenu {
                     const action = data?.actions.get(0);
                     if (this.TriggerActionType.has(action?.type) && action instanceof ItemStackRequestActionTransferBase) {
                         const slotInfo = action.getSrc();
-
-                        const response = new ResponseData();
-                        response.slotInfo = slotInfo;
-                        response.itemStack = this.slots[slotInfo.slot];
+                        const response = createResponseData(slotInfo, this.getItem(slotInfo.slot));
                         if (callback) callback.call(this, response);
                     }
                 }

@@ -22,10 +22,10 @@ events.playerJump.on((ev) => {
         {
             31: diamond,
         },
-        function (this, data) {
+        function (menu, data) {
             if (data.slotInfo.openContainerNetId !== 7) return;
-            this.entity.sendMessage("You can't take my precious!");
-            this.close();
+            menu.entity.sendMessage("You can't take my precious!");
+            menu.close();
         },
     );
     menu.open();

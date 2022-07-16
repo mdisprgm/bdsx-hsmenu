@@ -71,7 +71,7 @@ export class HSMenu {
     }
 
     private TriggerActionType = new Set<ItemStackRequestActionType>([ItemStackRequestActionType.Take, ItemStackRequestActionType.Place]);
-    constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (this: HSMenu, response: ResponseData) => void) {
+    constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (menu: HSMenu, response: ResponseData) => void) {
         this.entity = player;
         this.netId = player.getNetworkIdentifier();
         this.block = block;
@@ -98,7 +98,7 @@ export class HSMenu {
                     if (this.TriggerActionType.has(action?.type) && action instanceof ItemStackRequestActionTransferBase) {
                         const slotInfo = action.getSrc();
                         const response = createResponseData(slotInfo, this.getItem(slotInfo.slot));
-                        if (callback) callback.call(this, response);
+                        if (callback) callback(this, response);
                     }
                 }
             }),

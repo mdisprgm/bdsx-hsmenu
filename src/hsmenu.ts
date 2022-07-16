@@ -50,6 +50,8 @@ export class HSMenu {
      * @param slot slot n umber
      */
     setItem(slot: number, item: ItemStack): void {
+        this.assertValidSize(slot);
+
         this.slots[slot] = item.clone();
     }
     /**

@@ -25,9 +25,16 @@ type ContainerItems = Record<number, ItemStack>;
 class ResponseData {
     slotInfo: ItemStackRequestSlotInfo;
     itemStack: ItemStack;
+
+    isFromMenu(): this is { slotInfo: { openContainerNetId: 7 } } {
+        return this.slotInfo.openContainerNetId === 7;
+    }
 }
 function createResponseData(slotInfo: ItemStackRequestSlotInfo, itemStack: ItemStack): ResponseData {
-    return { slotInfo, itemStack };
+    const data = new ResponseData();
+    data.slotInfo = slotInfo;
+    data.itemStack = itemStack;
+    return data;
 }
 
 export class HSMenu {

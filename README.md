@@ -1,5 +1,5 @@
 
-# chestui Plugin
+# HSMenu Plugin
 The plugin for bdsx
 
 
@@ -23,7 +23,7 @@ events.playerJump.on((ev) => {
             31: diamond,
         },
         (menu, data) => {
-            if (data.slotInfo.openContainerNetId !== 7) return;
+            if (!data.isFromMenu()) return;
             menu.entity.sendMessage("You can't take my precious!");
             menu.close();
         },

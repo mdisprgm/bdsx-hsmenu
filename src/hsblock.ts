@@ -1,6 +1,6 @@
 import { Block } from "bdsx/bds/block";
 import { BlockPos } from "bdsx/bds/blockpos";
-import { ContainerType } from "bdsx/bds/inventory";
+import { ContainerId, ContainerType } from "bdsx/bds/inventory";
 import { UpdateBlockPacket } from "bdsx/bds/packets";
 import { ServerPlayer } from "bdsx/bds/player";
 import { UpdateBlockPacket$UpdateBlockPacket } from "./hacker";
@@ -13,6 +13,8 @@ export interface HSBlock {
     block: Block;
     size: HSBlock.size;
     type: HSBlock.type;
+
+    getContainerId?(target: ServerPlayer): ContainerId | number;
 }
 
 export namespace HSBlock {

@@ -11,6 +11,10 @@ export class HSChest implements HSBlock {
         return 3;
     }
 
+    getContainerId(target: ServerPlayer): number {
+        return target.nextContainerCounter();
+    }
+
     protected blockPos = new Map<Player, BlockPos>();
     protected originalBlockId = new Map<Player, number>();
 

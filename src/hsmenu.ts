@@ -38,18 +38,18 @@ function createResponseData(slotInfo: ItemStackRequestSlotInfo, itemStack: ItemS
 }
 
 export class HSMenu {
-    private static initInventorySlotPacket(packet: InventorySlotPacket, containerId: number, slot: number, ItemStack: ItemStack): void {
+    protected static initInventorySlotPacket(packet: InventorySlotPacket, containerId: number, slot: number, ItemStack: ItemStack): void {
         InventorySlotPacket$InventorySlotPacket(packet, containerId, slot, ItemStack);
     }
-    private hasOpen: boolean = false;
-    private assertValidSize(slot: number): void {
+    protected hasOpen: boolean = false;
+    protected assertValidSize(slot: number): void {
         if (slot !== (slot | 0)) throw new Error("slot number must be an integer.");
         if (slot > this.size) throw new Error("slot number must be less than or equal to the size of the menu.");
     }
-    private assertMenuNotOpen(): void {
+    protected assertMenuNotOpen(): void {
         if (!this.hasOpen) throw new Error("Menu is not open for the player.");
     }
-    private assertDefault(): void {
+    protected assertDefault(): void {
         this.assertMenuNotOpen();
     }
     /**
@@ -73,11 +73,16 @@ export class HSMenu {
     }
     sendItem(slot: number, item: ItemStack): void {
         this.assertDefault();
+        this.assertValidSize(slot);
         this.setItem(slot, item);
         this.sendInventory();
     }
 
-    private TriggerActionType = new Set<ItemStackRequestActionType>([ItemStackRequestActionType.Take, ItemStackRequestActionType.Place]);
+    protected TriggerActionType = new Set<ItemStackRequestActionType>([
+        ItemStackRequestActionType.Take,
+        ItemStackRequestActionType.Place,
+        ItemStackRequestActionType.Drop,
+    ]);
     constructor(player: ServerPlayer, block: HSBlock, slots: ContainerItems = {}, callback?: (menu: HSMenu, response: ResponseData) => void) {
         this.entity = player;
         this.netId = player.getNetworkIdentifier();
@@ -91,7 +96,8 @@ export class HSMenu {
 
         this.slots = slots;
 
-        this.mContainerId = this.entity.nextContainerCounter();
+        if (this.block.getContainerId) this.mContainerId = this.block.getContainerId(this.entity);
+        else this.mContainerId = this.entity.nextContainerCounter();
 
         for (const [slot, item] of Object.entries(this.slots)) {
             this.setItem(+slot, item);
@@ -122,7 +128,7 @@ export class HSMenu {
         );
     }
 
-    private openChest(): void {
+    protected openChest(): void {
         this.hasOpen = true;
 
         const pk = ContainerOpenPacket.allocate();
@@ -132,14 +138,14 @@ export class HSMenu {
         this.entity.sendPacket(pk);
         pk.dispose();
     }
-    private placeChest(): void {
+    protected placeChest(): void {
         this.block.place(this.entity);
     }
-    private destroyChest(): void {
+    protected destroyChest(): void {
         this.assertDefault();
         this.block.destroy(this.entity);
     }
-    private destruct(): void {
+    protected destruct(): void {
         this.assertDefault();
         for (let [slot, item] of Object.entries(this.slots)) {
             item.destruct();
@@ -181,30 +187,30 @@ export class HSMenu {
         pkt.dispose();
     }
 
-    private block: HSBlock;
-    private blockPos: BlockPos = BlockPos.create(0, 0, 0);
-    private mContainerId: number;
+    protected block: HSBlock;
+    protected blockPos: BlockPos = BlockPos.create(0, 0, 0);
+    protected mContainerId: number;
     get containerId(): number {
         return this.mContainerId;
     }
     entity: ServerPlayer;
-    private slots: Record<number, ItemStack>;
-    private netId: NetworkIdentifier;
-    private size: HSBlock.size;
+    protected slots: Record<number, ItemStack>;
+    protected netId: NetworkIdentifier;
+    protected size: HSBlock.size;
 
     protected onItemStackRequest: (pk: ItemStackRequestPacket, ni: NetworkIdentifier) => CANCEL | void;
     protected onContainerClose: (pk: ContainerClosePacket, ni: NetworkIdentifier) => CANCEL | void;
     protected onDisconnect: (event: PlayerLeftEvent) => void;
 
-    private static Closed() {
+    protected static Closed() {
         throw new Error("the menu is closed already");
     }
-    private disabled = false;
+    protected disabled = false;
     /**
      *
      * @returns returns false if the instance is disabled already
      */
-    private disable(): boolean {
+    protected disable(): boolean {
         if (!this.disabled) return false;
         const properties: PropertyDescriptorMap = {};
         for (const key of Object.getOwnPropertyNames(this)) {

@@ -107,7 +107,7 @@ export class HSMenu {
             (this.onItemStackRequest = (pk, ni) => {
                 if (ni.equals(this.netId)) {
                     const data = pk.getRequestBatch().data.get(0);
-                    const action = data?.actions.get(0);
+                    const action = data?.getActions().get(0);
                     if (this.TriggerActionType.has(action?.type) && action instanceof ItemStackRequestActionTransferBase) {
                         const slotInfo = action.getSrc();
                         const response = createResponseData(slotInfo, this.getItem(slotInfo.slot));

@@ -71,6 +71,7 @@ export class HSMenu {
      * @returns DO NOT DESTRUCT. THEY MUST BE DESTRUCTED BY LIBRARY.
      */
     getItem(slot: number): ItemStack {
+        this.assertDefault();
         this.assertValidSize(slot);
         return this._extractItem(this.slots[slot]);
     }
@@ -126,7 +127,7 @@ export class HSMenu {
         );
         events.playerLeft.on(
             (this.onDisconnect = (event) => {
-                if (event.player.getNetworkIdentifier().equals(this.netId)) this.destruct();
+                if (event.player.getNetworkIdentifier().equals(this.netId)) this.destructUI();
             }),
         );
     }
@@ -151,16 +152,10 @@ export class HSMenu {
         this.assertDefault();
         this.block.destroy(this.entity);
     }
-    protected destruct(): void {
+    protected destructUI(): void {
         this.assertDefault();
         for (const [slot, item] of Object.entries(this.slots)) {
-            if (item instanceof ItemStack) {
-                item.destruct();
-            } else {
-                if (item[1].destruct) {
-                    item[0].destruct();
-                }
-            }
+            this._destructItem(item);
         }
         this.destroyChest();
         events.packetBefore(MinecraftPacketIds.ItemStackRequest).remove(this.onItemStackRequest);
@@ -177,7 +172,7 @@ export class HSMenu {
     close(): void {
         this.assertDefault();
 
-        this.destruct();
+        this.destructUI();
         this.disable();
     }
     sendInventory(): void {
@@ -238,6 +233,19 @@ export class HSMenu {
     }
     protected _extractItem(instance: ContainerItem): ItemStack {
         return instance instanceof ItemStack ? instance : instance[0];
+    }
+    protected _destructItem(instance: ContainerItem): void {
+        if (!this._shouldDestruct(instance)) {
+            return;
+        }
+        if (instance instanceof ItemStack) {
+            instance.destruct();
+        } else {
+            instance[0].destruct();
+        }
+    }
+    protected _shouldDestruct(instance: ContainerItem): boolean {
+        return instance instanceof ItemStack ? true : instance[1].destruct;
     }
     isDisabled(): boolean {
         return this.disabled;

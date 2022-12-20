@@ -20,7 +20,11 @@ import { PlayerLeftEvent } from "bdsx/event_impl/entityevent";
 import { InventorySlotPacket$InventorySlotPacket } from "./hacker";
 import { HSBlock } from "./hsblock";
 
-type ContainerItems = Record<number, ItemStack>;
+interface Option {
+    destruct: boolean;
+}
+type ContainerItem = ItemStack | [ItemStack, Option];
+type ContainerItems = Record<number, ContainerItem>;
 
 class ResponseData {
     slotInfo: ItemStackRequestSlotInfo;
@@ -68,8 +72,7 @@ export class HSMenu {
      */
     getItem(slot: number): ItemStack {
         this.assertValidSize(slot);
-
-        return this.slots[slot];
+        return this._extractItem(this.slots[slot]);
     }
     sendItem(slot: number, item: ItemStack): void {
         this.assertDefault();
@@ -100,7 +103,7 @@ export class HSMenu {
         else this.mContainerId = this.entity.nextContainerCounter();
 
         for (const [slot, item] of Object.entries(this.slots)) {
-            this.setItem(+slot, item);
+            this.setItem(+slot, this._extractItem(item));
         }
 
         events.packetBefore(MinecraftPacketIds.ItemStackRequest).on(
@@ -148,7 +151,13 @@ export class HSMenu {
     protected destruct(): void {
         this.assertDefault();
         for (let [slot, item] of Object.entries(this.slots)) {
-            item.destruct();
+            if (item instanceof ItemStack) {
+                item.destruct();
+            } else {
+                if (item[1].destruct) {
+                    item[0].destruct();
+                }
+            }
         }
         this.destroyChest();
         events.packetBefore(MinecraftPacketIds.ItemStackRequest).remove(this.onItemStackRequest);
@@ -170,9 +179,12 @@ export class HSMenu {
     }
     sendInventory(): void {
         this.assertDefault();
-        for (const [slot_, item] of Object.entries(this.slots)) {
-            const slot = +slot_;
-            if (!this.slots[slot]?.sameItem(item)) this.slots[slot].destruct();
+        for (const [_slot, _item] of Object.entries(this.slots)) {
+            const slot = +_slot;
+            const item = this._extractItem(_item);
+            const fromSlot = this._extractItem(this.slots[slot]);
+
+            if (!fromSlot.sameItem(item)) fromSlot.destruct();
             const pk = new InventorySlotPacket(true);
             HSMenu.initInventorySlotPacket(pk, this.mContainerId, slot, item);
             this.entity.sendPacket(pk);
@@ -194,7 +206,7 @@ export class HSMenu {
         return this.mContainerId;
     }
     entity: ServerPlayer;
-    protected slots: Record<number, ItemStack>;
+    protected slots: ContainerItems;
     protected netId: NetworkIdentifier;
     protected size: HSBlock.size;
 
@@ -218,6 +230,9 @@ export class HSMenu {
         }
         Object.defineProperties(this, properties);
         return (this.disabled = true);
+    }
+    protected _extractItem(instance: ContainerItem): ItemStack {
+        return instance instanceof ItemStack ? instance : instance[0];
     }
     isDisabled(): boolean {
         return this.disabled;

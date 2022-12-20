@@ -47,11 +47,11 @@ export class HSMenu {
     }
     protected hasOpen: boolean = false;
     protected assertValidSize(slot: number): void {
-        if (slot !== (slot | 0)) throw new Error("slot number must be an integer.");
-        if (slot > this.size) throw new Error("slot number must be less than or equal to the size of the menu.");
+        if (slot !== (slot | 0)) throw Error("slot number must be an integer.");
+        if (slot > this.size) throw Error("slot number must be less than or equal to the size of the menu.");
     }
-    protected assertMenuNotOpen(): void {
-        if (!this.hasOpen) throw new Error("Menu is not open for the player.");
+    protected assertMenuNotOpen(): asserts this is { hasOpen: true } {
+        if (!this.hasOpen) throw Error("Menu is not open for the player.");
     }
     protected assertDefault(): void {
         this.assertMenuNotOpen();
@@ -132,6 +132,9 @@ export class HSMenu {
     }
 
     protected openChest(): void {
+        if (this.hasOpen) {
+            throw Error("Already Opened");
+        }
         this.hasOpen = true;
 
         const pk = ContainerOpenPacket.allocate();
@@ -150,7 +153,7 @@ export class HSMenu {
     }
     protected destruct(): void {
         this.assertDefault();
-        for (let [slot, item] of Object.entries(this.slots)) {
+        for (const [slot, item] of Object.entries(this.slots)) {
             if (item instanceof ItemStack) {
                 item.destruct();
             } else {
@@ -215,7 +218,7 @@ export class HSMenu {
     protected onDisconnect: (event: PlayerLeftEvent) => void;
 
     protected static Closed() {
-        throw new Error("the menu is closed already");
+        throw Error("the menu is closed already");
     }
     protected disabled = false;
     /**
@@ -223,7 +226,9 @@ export class HSMenu {
      * @returns returns false if the instance is disabled already
      */
     protected disable(): boolean {
-        if (!this.disabled) return false;
+        if (this.disabled) {
+            return false;
+        }
         const properties: PropertyDescriptorMap = {};
         for (const key of Object.getOwnPropertyNames(this)) {
             properties[key] = { get: HSMenu.Closed };
